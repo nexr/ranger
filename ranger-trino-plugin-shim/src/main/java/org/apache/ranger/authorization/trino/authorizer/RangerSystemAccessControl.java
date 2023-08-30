@@ -17,21 +17,15 @@ import io.trino.spi.connector.CatalogSchemaName;
 import io.trino.spi.connector.CatalogSchemaRoutineName;
 import io.trino.spi.connector.CatalogSchemaTableName;
 import io.trino.spi.connector.SchemaTableName;
-import io.trino.spi.security.TrinoPrincipal;
-import io.trino.spi.security.Privilege;
-import io.trino.spi.security.SystemAccessControl;
-import io.trino.spi.security.SystemSecurityContext;
-import io.trino.spi.security.ViewExpression;
+import io.trino.spi.eventlistener.EventListener;
+import io.trino.spi.function.FunctionKind;
+import io.trino.spi.security.*;
 import io.trino.spi.type.Type;
 import org.apache.ranger.plugin.classloader.RangerPluginClassLoader;
 
 import javax.inject.Inject;
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class RangerSystemAccessControl
   implements SystemAccessControl {
@@ -82,6 +76,26 @@ public class RangerSystemAccessControl
   }
 
   @Override
+  public void checkCanCreateCatalog(SystemSecurityContext context, String catalog) {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanCreateCatalog(context, catalog);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanDropCatalog(SystemSecurityContext context, String catalog) {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanDropCatalog(context, catalog);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
   public void checkCanAccessCatalog(SystemSecurityContext context, String catalogName) {
     try {
       activatePluginClassLoader();
@@ -104,14 +118,15 @@ public class RangerSystemAccessControl
   }
 
   @Override
-  public void checkCanCreateSchema(SystemSecurityContext context, CatalogSchemaName schema) {
+  public void checkCanCreateSchema(SystemSecurityContext context, CatalogSchemaName schema, Map<String, Object> properties) {
     try {
       activatePluginClassLoader();
-      systemAccessControlImpl.checkCanCreateSchema(context, schema);
+      systemAccessControlImpl.checkCanCreateSchema(context, schema, properties);
     } finally {
       deactivatePluginClassLoader();
     }
   }
+
 
   @Override
   public void checkCanDropSchema(SystemSecurityContext context, CatalogSchemaName schema) {
@@ -238,10 +253,31 @@ public class RangerSystemAccessControl
   }
 
   @Override
+  public void checkCanAlterColumn(SystemSecurityContext context, CatalogSchemaTableName table) {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanAlterColumn(context, table);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
   public void checkCanInsertIntoTable(SystemSecurityContext context, CatalogSchemaTableName table) {
     try {
       activatePluginClassLoader();
       systemAccessControlImpl.checkCanInsertIntoTable(context, table);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanSetTableAuthorization(SystemSecurityContext context, CatalogSchemaTableName table, TrinoPrincipal principal)
+  {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanSetTableAuthorization(context, table, principal);
     } finally {
       deactivatePluginClassLoader();
     }
@@ -297,6 +333,17 @@ public class RangerSystemAccessControl
       systemAccessControlImpl.checkCanDropMaterializedView(context,materializedView);
     }
     finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanSetMaterializedViewProperties(SystemSecurityContext context, CatalogSchemaTableName materializedView, Map<String, Optional<Object>> properties)
+  {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanSetMaterializedViewProperties(context, materializedView, properties);
+    } finally {
       deactivatePluginClassLoader();
     }
   }
@@ -362,6 +409,7 @@ public class RangerSystemAccessControl
     }
   }
 
+  @Deprecated
   @Override
   public void checkCanViewQueryOwnedBy(SystemSecurityContext context, String queryOwner) {
     try {
@@ -372,6 +420,17 @@ public class RangerSystemAccessControl
     }
   }
 
+  @Override
+  public void checkCanViewQueryOwnedBy(SystemSecurityContext context, Identity queryOwner) {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanViewQueryOwnedBy(context, queryOwner);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Deprecated
   @Override
   public Set<String> filterViewQueryOwnedBy(SystemSecurityContext context, Set<String> queryOwners) {
     Set<String> filteredQueryOwners;
@@ -385,10 +444,55 @@ public class RangerSystemAccessControl
   }
 
   @Override
+  public Collection<Identity> filterViewQueryOwnedBy(SystemSecurityContext context, Collection<Identity> queryOwners) {
+    Collection<Identity> filteredQueryOwners;
+    try {
+      activatePluginClassLoader();
+      filteredQueryOwners = systemAccessControlImpl.filterViewQueryOwnedBy(context, queryOwners);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+    return filteredQueryOwners;
+  }
+
+  @Deprecated
+  @Override
   public void checkCanKillQueryOwnedBy(SystemSecurityContext context, String queryOwner) {
     try {
       activatePluginClassLoader();
       systemAccessControlImpl.checkCanKillQueryOwnedBy(context, queryOwner);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanKillQueryOwnedBy(SystemSecurityContext context, Identity queryOwner) {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanKillQueryOwnedBy(context, queryOwner);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanReadSystemInformation(SystemSecurityContext context)
+  {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanReadSystemInformation(context);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanWriteSystemInformation(SystemSecurityContext context)
+  {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanWriteSystemInformation(context);
     } finally {
       deactivatePluginClassLoader();
     }
@@ -478,6 +582,39 @@ public class RangerSystemAccessControl
   }
 
   @Override
+  public void checkCanGrantSchemaPrivilege(SystemSecurityContext context, Privilege privilege, CatalogSchemaName schema, TrinoPrincipal grantee, boolean grantOption)
+  {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanGrantSchemaPrivilege(context, privilege, schema, grantee, grantOption);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanDenySchemaPrivilege(SystemSecurityContext context, Privilege privilege, CatalogSchemaName schema, TrinoPrincipal grantee)
+  {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanDenySchemaPrivilege(context, privilege, schema, grantee);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanRevokeSchemaPrivilege(SystemSecurityContext context, Privilege privilege, CatalogSchemaName schema, TrinoPrincipal revokee, boolean grantOption)
+  {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanRevokeSchemaPrivilege(context, privilege, schema, revokee, grantOption);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
   public void checkCanRevokeTablePrivilege(SystemSecurityContext context, Privilege privilege, CatalogSchemaTableName table, TrinoPrincipal revokee, boolean grantOptionFor) {
     try {
       activatePluginClassLoader();
@@ -486,6 +623,18 @@ public class RangerSystemAccessControl
       deactivatePluginClassLoader();
     }
   }
+
+  @Override
+  public void checkCanSetViewComment(SystemSecurityContext context, CatalogSchemaTableName view)
+  {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanSetViewComment(context, view);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
 
   @Override
   public void checkCanShowRoles(SystemSecurityContext context) {
@@ -517,17 +666,6 @@ public class RangerSystemAccessControl
     }
   }
 
-  @Override
-  public Optional<ViewExpression> getRowFilter(SystemSecurityContext context, CatalogSchemaTableName tableName) {
-    Optional<ViewExpression> viewExpression;
-    try {
-      activatePluginClassLoader();
-      viewExpression = systemAccessControlImpl.getRowFilter(context, tableName);
-    } finally {
-      deactivatePluginClassLoader();
-    }
-    return viewExpression;
-  }
 
   @Override
   public List<ViewExpression> getRowFilters(SystemSecurityContext context, CatalogSchemaTableName tableName) {
@@ -542,6 +680,17 @@ public class RangerSystemAccessControl
   }
 
   @Override
+  public void checkCanDenyTablePrivilege(SystemSecurityContext context, Privilege privilege, CatalogSchemaTableName table, TrinoPrincipal grantee)
+  {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanDenyTablePrivilege(context, privilege, table, grantee);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
   public Optional<ViewExpression> getColumnMask(SystemSecurityContext context, CatalogSchemaTableName tableName, String columnName, Type type) {
     Optional<ViewExpression> viewExpression;
     try {
@@ -553,6 +702,7 @@ public class RangerSystemAccessControl
     return viewExpression;
   }
 
+  @Deprecated
   @Override
   public List<ViewExpression> getColumnMasks(SystemSecurityContext context, CatalogSchemaTableName tableName, String columnName, Type type) {
     List<ViewExpression> viewExpressionList;
@@ -566,10 +716,73 @@ public class RangerSystemAccessControl
   }
 
   @Override
+  public void checkCanCreateRole(SystemSecurityContext context, String role, Optional<TrinoPrincipal> grantor) {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanCreateRole(context, role, grantor);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanDropRole(SystemSecurityContext context, String role) {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanDropRole(context, role);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanGrantRoles(SystemSecurityContext context, Set<String> roles, Set<TrinoPrincipal> grantees, boolean adminOption, Optional<TrinoPrincipal> grantor)   {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanGrantRoles(context, roles, grantees, adminOption, grantor);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanRevokeRoles(SystemSecurityContext context, Set<String> roles, Set<TrinoPrincipal> grantees, boolean adminOption, Optional<TrinoPrincipal> grantor)   {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanRevokeRoles(context, roles, grantees, adminOption, grantor);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanShowRoleAuthorizationDescriptors(SystemSecurityContext context) {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanShowRoleAuthorizationDescriptors(context);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+
+  @Deprecated
+  @Override
   public void checkCanSetUser(Optional<Principal> principal, String userName) {
     try {
       activatePluginClassLoader();
       systemAccessControlImpl.checkCanSetUser(principal, userName);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanGrantExecuteFunctionPrivilege(SystemSecurityContext context, FunctionKind functionKind, CatalogSchemaRoutineName functionName, TrinoPrincipal grantee, boolean grantOption)
+  {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanGrantExecuteFunctionPrivilege(context, functionKind, functionName, grantee, grantOption);
     } finally {
       deactivatePluginClassLoader();
     }
@@ -627,6 +840,17 @@ public class RangerSystemAccessControl
   }
 
   @Override
+  public void checkCanExecuteFunction(SystemSecurityContext systemSecurityContext, FunctionKind functionKind, CatalogSchemaRoutineName functionName)
+  {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanExecuteFunction(systemSecurityContext, functionKind, functionName);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
   public void checkCanExecuteFunction(SystemSecurityContext systemSecurityContext, String functionName) {
     try {
       activatePluginClassLoader();
@@ -634,6 +858,18 @@ public class RangerSystemAccessControl
     } finally {
       deactivatePluginClassLoader();
     }
+  }
+
+  @Override
+  public Iterable<EventListener> getEventListeners() {
+    Iterable<EventListener> eventListeners;
+    try {
+      activatePluginClassLoader();
+      eventListeners = systemAccessControlImpl.getEventListeners();
+    } finally {
+      deactivatePluginClassLoader();
+    }
+    return eventListeners;
   }
 
   private void activatePluginClassLoader() {
