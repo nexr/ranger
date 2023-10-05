@@ -68,22 +68,11 @@ public class RangerSystemAccessControl
   final public static String RANGER_CONFIG_HADOOP_CONFIG = "ranger.hadoop_config";
   final public static String RANGER_TRINO_DEFAULT_HADOOP_CONF = "trino-ranger-site.xml";
   final public static String RANGER_TRINO_SERVICETYPE = "trino";
-  final public static String RANGER_TRINO_SERVICENAME = "ndap-trino-repo";
   final public static String RANGER_TRINO_APPID = "trino";
 
   final private RangerBasePlugin rangerPlugin;
 
   private boolean useUgi = false;
-
-  public RangerSystemAccessControl() {
-    rangerPlugin = new RangerBasePlugin(RANGER_TRINO_SERVICETYPE, RANGER_TRINO_SERVICENAME, RANGER_TRINO_APPID);
-    initializeRangerPlugin();
-  }
-
-  private void initializeRangerPlugin() {
-    rangerPlugin.init();
-    rangerPlugin.setResultProcessor(new RangerDefaultAuditHandler());
-  }
 
   public RangerSystemAccessControl(Map<String, String> config) {
     super();
