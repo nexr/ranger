@@ -65,7 +65,6 @@ public class RangerSystemAccessControlTest {
   private static final CatalogSchemaRoutineName aliceProcedure = new CatalogSchemaRoutineName("alice-catalog", "schema", "procedure");
   private static final String functionName = new String("function");
 
-  private static final Map<String, Object> aliceProperties = new HashMap<String, Object>();
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
     Map<String, String> config = new HashMap<>();
@@ -112,13 +111,13 @@ public class RangerSystemAccessControlTest {
     assertEquals(accessControlManager.filterSchemas(context(alice), aliceCatalog, aliceSchemas), aliceSchemas);
     assertEquals(accessControlManager.filterSchemas(context(bob), "alice-catalog", aliceSchemas), ImmutableSet.of());
 
-    accessControlManager.checkCanCreateSchema(context(alice), aliceSchema, aliceProperties );
+    accessControlManager.checkCanCreateSchema(context(alice), aliceSchema);
     accessControlManager.checkCanDropSchema(context(alice), aliceSchema);
     accessControlManager.checkCanRenameSchema(context(alice), aliceSchema, "new-schema");
     accessControlManager.checkCanShowSchemas(context(alice), aliceCatalog);
 
     try {
-      accessControlManager.checkCanCreateSchema(context(bob), aliceSchema, aliceProperties);
+      accessControlManager.checkCanCreateSchema(context(bob), aliceSchema);
     } catch (AccessDeniedException expected) {
     }
 
@@ -134,7 +133,7 @@ public class RangerSystemAccessControlTest {
     assertEquals(accessControlManager.filterTables(context(alice), aliceCatalog, aliceTables), aliceTables);
     assertEquals(accessControlManager.filterTables(context(bob), "alice-catalog", aliceTables), ImmutableSet.of());
 
-    accessControlManager.checkCanCreateTable(context(alice), aliceTable,aliceProperties);
+    accessControlManager.checkCanCreateTable(context(alice), aliceTable,Map.of());
     accessControlManager.checkCanDropTable(context(alice), aliceTable);
     accessControlManager.checkCanSelectFromColumns(context(alice), aliceTable, ImmutableSet.of());
     accessControlManager.checkCanInsertIntoTable(context(alice), aliceTable);
@@ -143,7 +142,7 @@ public class RangerSystemAccessControlTest {
 
 
     try {
-      accessControlManager.checkCanCreateTable(context(bob), aliceTable,aliceProperties);
+      accessControlManager.checkCanCreateTable(context(bob), aliceTable,Map.of());
     } catch (AccessDeniedException expected) {
     }
   }
