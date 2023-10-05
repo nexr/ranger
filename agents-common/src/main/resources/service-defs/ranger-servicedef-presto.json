@@ -213,66 +213,60 @@
     },
     {
       "itemId": 2,
-      "name": "update",
-      "label": "Update"
-    },
-    {
-      "itemId": 3,
       "name": "insert",
       "label": "Insert"
     },
     {
-      "itemId": 4,
+      "itemId": 3,
       "name": "create",
       "label": "Create"
     },
     {
-      "itemId": 5,
+      "itemId": 4,
       "name": "drop",
       "label": "Drop"
     },
     {
-      "itemId": 6,
+      "itemId": 5,
       "name": "delete",
       "label": "Delete"
     },
     {
-      "itemId": 7,
+      "itemId": 6,
       "name": "use",
       "label": "Use"
     },
     {
-      "itemId": 8,
+      "itemId": 7,
       "name": "alter",
       "label": "Alter"
     },
     {
-      "itemId": 9,
+      "itemId": 8,
       "name": "grant",
       "label": "Grant"
     },
     {
-      "itemId": 10,
+      "itemId": 9,
       "name": "revoke",
       "label": "Revoke"
     },
     {
-      "itemId": 11,
+      "itemId": 10,
       "name": "show",
       "label": "Show"
     },
     {
-      "itemId": 12,
+      "itemId": 11,
       "name": "impersonate",
       "label": "Impersonate"
     },
     {
-      "itemId": 13,
+      "itemId": 12,
       "name": "all",
       "label": "All",
       "impliedGrants": [
         "select",
-        "update",
         "insert",
         "create",
         "delete",
@@ -287,7 +281,7 @@
       ]
     },
     {
-      "itemId": 14,
+      "itemId": 13,
       "name": "execute",
       "label": "execute"
     }
