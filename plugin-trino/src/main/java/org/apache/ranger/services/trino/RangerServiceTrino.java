@@ -53,18 +53,18 @@ public class RangerServiceTrino extends RangerBaseService {
   public static final String ACCESS_TYPE_ALL    = "all";
   public static final String WILDCARD_ASTERISK  = "*";
 
-  public static final String HIVE_CATALOG_DEFAULT_NAME = "hive";
-  public static final String HIVE_DB_DEFAULT   		        = "default";
-  public static final String HIVE_DEFAULT_DB_POLICYNAME = "hive catalog default schema tables columns";
-  public static final String HIVE_DB_INFORMATIONSCHEMA   		        = "information_schema";
-  public static final String HIVE_DB_INFORMATION_SCHEMA_DB_POLICYNAME = "hive catalog information_schema schema tables columns";
-  public static final String HIVE_USERHOME_DB_POLICYNAME = "hive catalog {USER} schema tables columns";
+  public static final String SPARK_CATALOG_DEFAULT_NAME = "spark";
+  public static final String SPARK_DB_DEFAULT   		        = "default";
+  public static final String SPARK_DEFAULT_DB_POLICYNAME = "spark catalog default schema tables columns";
+  public static final String SPARK_DB_INFORMATIONSCHEMA   		        = "information_schema";
+  public static final String SPARK_DB_INFORMATION_SCHEMA_DB_POLICYNAME = "spark catalog information_schema schema tables columns";
+  public static final String SPARK_USERHOME_DB_POLICYNAME = "spark catalog {USER} schema tables columns";
 
-  public static final String PHOENIX_CATALOG_DEFAULT_NAME = "phoenix";
-  public static final String PHOENIX_DB_DEFAULT   		        = "default";
-  public static final String PHOENIX_DEFAULT_DB_POLICYNAME = "phoenix catalog default schema tables columns";
-  public static final String PHOENIX_DB_SYSTEM   		        = "system";
-  public static final String PHOENIX_SYSTEM_DB_POLICYNAME = "phoenix catalog system schema tables columns";
+  public static final String ICEBERG_CATALOG_DEFAULT_NAME = "iceberg";
+  public static final String ICEBERG_DB_DEFAULT   		        = "default";
+  public static final String ICEBERG_DEFAULT_DB_POLICYNAME = "iceberg catalog default schema tables columns";
+  public static final String ICEBERG_DB_SYSTEM   		        = "system";
+  public static final String ICEBERG_SYSTEM_DB_POLICYNAME = "iceberg catalog system schema tables columns";
 
   public static final String TRINO_SYSTEM_CATALOG        = "system";
   public static final String TRINO_SYSTEM_CATALOG_POLICYNAME = "system catalog schema tables columns";
@@ -131,25 +131,17 @@ public class RangerServiceTrino extends RangerBaseService {
       }
     }
 
-    //Policy for hive catalog default db
-    RangerPolicy hiveDefaultDBPolicy = createHiveDefaultDBPolicy();
-    ret.add(hiveDefaultDBPolicy);
-
-    //Policy for hive catalog {USER} db
-    RangerPolicy hiveUserDBPolicy = createHiveUserHomeDBPolicy();
-    ret.add(hiveUserDBPolicy);
-
     //Policy for hive catalog information_schema db
     RangerPolicy hiveInformationSchemaDBPolicy = createHiveInformationSchemaDBPolicy();
     ret.add(hiveInformationSchemaDBPolicy);
 
-    //Policy for phoenix catalog default db
-    RangerPolicy phoenixDefaultDBPolicy = createPhoenixDefaultDBPolicy();
-    ret.add(phoenixDefaultDBPolicy);
+    //Policy for spark catalog default db
+    RangerPolicy sparkDefaultDBPolicy = createSparkDefaultDBPolicy();
+    ret.add(sparkDefaultDBPolicy);
 
-    //Policy for phoenix catalog system db
-    RangerPolicy phoenixSystemDBPolicy = createPhoenixSystemDBPolicy();
-    ret.add(phoenixSystemDBPolicy);
+    //Policy for iceberg catalog default db
+    RangerPolicy icebergDefaultDBPolicy = createIcebergDefaultDBPolicy();
+    ret.add(icebergDefaultDBPolicy);
 
     // Policy for system catalog
     RangerPolicy systemCatalogPolicy = createSystemCatalogPolicy();
@@ -197,16 +189,16 @@ public class RangerServiceTrino extends RangerBaseService {
     return systemCatalogPolicy;
   }
 
-  private RangerPolicy createHiveDefaultDBPolicy() {
+  private RangerPolicy createSparkDefaultDBPolicy() {
     RangerPolicy defaultDBPolicy = new RangerPolicy();
 
-    defaultDBPolicy.setName(HIVE_DEFAULT_DB_POLICYNAME);
+    defaultDBPolicy.setName(SPARK_DEFAULT_DB_POLICYNAME);
     defaultDBPolicy.setService(serviceName);
 
     // resources
     Map<String, RangerPolicy.RangerPolicyResource> resources = new HashMap<>();
-    resources.put(RESOURCE_CATALOG, new RangerPolicy.RangerPolicyResource(Arrays.asList(HIVE_CATALOG_DEFAULT_NAME), false, false));
-    resources.put(RESOURCE_SCHEMA, new RangerPolicy.RangerPolicyResource(Arrays.asList(HIVE_DB_DEFAULT), false, false));
+    resources.put(RESOURCE_CATALOG, new RangerPolicy.RangerPolicyResource(Arrays.asList(SPARK_CATALOG_DEFAULT_NAME), false, false));
+    resources.put(RESOURCE_SCHEMA, new RangerPolicy.RangerPolicyResource(Arrays.asList(SPARK_DB_DEFAULT), false, false));
     resources.put(RESOURCE_TABLE, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
     resources.put(RESOURCE_COLUMN, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
 
@@ -214,30 +206,6 @@ public class RangerServiceTrino extends RangerBaseService {
     List<RangerPolicy.RangerPolicyItemAccess> accesses = new ArrayList<RangerPolicy.RangerPolicyItemAccess>();
     accesses.add(new RangerPolicy.RangerPolicyItemAccess(ACCESS_TYPE_CREATE));
     RangerPolicy.RangerPolicyItem item = new RangerPolicy.RangerPolicyItem(accesses, null, Arrays.asList(RangerPolicyEngine.GROUP_PUBLIC), null, null, false);
-
-    defaultDBPolicy.setResources(resources);
-    defaultDBPolicy.setPolicyItems(Collections.singletonList(item));
-
-    return defaultDBPolicy;
-  }
-
-  private RangerPolicy createHiveUserHomeDBPolicy() {
-    RangerPolicy defaultDBPolicy = new RangerPolicy();
-
-    defaultDBPolicy.setName(HIVE_USERHOME_DB_POLICYNAME);
-    defaultDBPolicy.setService(serviceName);
-
-    // resources
-    Map<String, RangerPolicy.RangerPolicyResource> resources = new HashMap<>();
-    resources.put(RESOURCE_CATALOG, new RangerPolicy.RangerPolicyResource(Arrays.asList(HIVE_CATALOG_DEFAULT_NAME), false, false));
-    resources.put(RESOURCE_SCHEMA, new RangerPolicy.RangerPolicyResource(Arrays.asList(RangerPolicyEngine.USER_CURRENT), false, false));
-    resources.put(RESOURCE_TABLE, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
-    resources.put(RESOURCE_COLUMN, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
-
-    // policy
-    List<RangerPolicy.RangerPolicyItemAccess> accesses = new ArrayList<RangerPolicy.RangerPolicyItemAccess>();
-    accesses.add(new RangerPolicy.RangerPolicyItemAccess(ACCESS_TYPE_ALL));
-    RangerPolicy.RangerPolicyItem item = new RangerPolicy.RangerPolicyItem(accesses, Arrays.asList(RangerPolicyEngine.USER_CURRENT), null, null, null, false);
 
     defaultDBPolicy.setResources(resources);
     defaultDBPolicy.setPolicyItems(Collections.singletonList(item));
@@ -248,13 +216,13 @@ public class RangerServiceTrino extends RangerBaseService {
   private RangerPolicy createHiveInformationSchemaDBPolicy() {
     RangerPolicy defaultDBPolicy = new RangerPolicy();
 
-    defaultDBPolicy.setName(HIVE_DB_INFORMATION_SCHEMA_DB_POLICYNAME);
+    defaultDBPolicy.setName(SPARK_DB_INFORMATION_SCHEMA_DB_POLICYNAME);
     defaultDBPolicy.setService(serviceName);
 
     // resources
     Map<String, RangerPolicy.RangerPolicyResource> resources = new HashMap<>();
-    resources.put(RESOURCE_CATALOG, new RangerPolicy.RangerPolicyResource(Arrays.asList(HIVE_CATALOG_DEFAULT_NAME), false, false));
-    resources.put(RESOURCE_SCHEMA, new RangerPolicy.RangerPolicyResource(Arrays.asList(HIVE_DB_INFORMATIONSCHEMA), false, false));
+    resources.put(RESOURCE_CATALOG, new RangerPolicy.RangerPolicyResource(Arrays.asList(SPARK_CATALOG_DEFAULT_NAME), false, false));
+    resources.put(RESOURCE_SCHEMA, new RangerPolicy.RangerPolicyResource(Arrays.asList(SPARK_DB_INFORMATIONSCHEMA), false, false));
     resources.put(RESOURCE_TABLE, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
     resources.put(RESOURCE_COLUMN, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
 
@@ -269,46 +237,22 @@ public class RangerServiceTrino extends RangerBaseService {
     return defaultDBPolicy;
   }
 
-  private RangerPolicy createPhoenixDefaultDBPolicy() {
+  private RangerPolicy createIcebergDefaultDBPolicy() {
     RangerPolicy defaultDBPolicy = new RangerPolicy();
 
-    defaultDBPolicy.setName(PHOENIX_DEFAULT_DB_POLICYNAME);
+    defaultDBPolicy.setName(ICEBERG_DEFAULT_DB_POLICYNAME);
     defaultDBPolicy.setService(serviceName);
 
     // resources
     Map<String, RangerPolicy.RangerPolicyResource> resources = new HashMap<>();
-    resources.put(RESOURCE_CATALOG, new RangerPolicy.RangerPolicyResource(Arrays.asList(PHOENIX_CATALOG_DEFAULT_NAME), false, false));
-    resources.put(RESOURCE_SCHEMA, new RangerPolicy.RangerPolicyResource(Arrays.asList(PHOENIX_DB_DEFAULT), false, false));
+    resources.put(RESOURCE_CATALOG, new RangerPolicy.RangerPolicyResource(Arrays.asList(ICEBERG_CATALOG_DEFAULT_NAME), false, false));
+    resources.put(RESOURCE_SCHEMA, new RangerPolicy.RangerPolicyResource(Arrays.asList(ICEBERG_DB_DEFAULT), false, false));
     resources.put(RESOURCE_TABLE, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
     resources.put(RESOURCE_COLUMN, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
 
     // policy
     List<RangerPolicy.RangerPolicyItemAccess> accesses = new ArrayList<RangerPolicy.RangerPolicyItemAccess>();
     accesses.add(new RangerPolicy.RangerPolicyItemAccess(ACCESS_TYPE_CREATE));
-    RangerPolicy.RangerPolicyItem item = new RangerPolicy.RangerPolicyItem(accesses, null, Arrays.asList(RangerPolicyEngine.GROUP_PUBLIC), null, null, false);
-
-    defaultDBPolicy.setResources(resources);
-    defaultDBPolicy.setPolicyItems(Collections.singletonList(item));
-
-    return defaultDBPolicy;
-  }
-
-  private RangerPolicy createPhoenixSystemDBPolicy() {
-    RangerPolicy defaultDBPolicy = new RangerPolicy();
-
-    defaultDBPolicy.setName(PHOENIX_SYSTEM_DB_POLICYNAME);
-    defaultDBPolicy.setService(serviceName);
-
-    // resources
-    Map<String, RangerPolicy.RangerPolicyResource> resources = new HashMap<>();
-    resources.put(RESOURCE_CATALOG, new RangerPolicy.RangerPolicyResource(Arrays.asList(PHOENIX_CATALOG_DEFAULT_NAME), false, false));
-    resources.put(RESOURCE_SCHEMA, new RangerPolicy.RangerPolicyResource(Arrays.asList(PHOENIX_DB_SYSTEM), false, false));
-    resources.put(RESOURCE_TABLE, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
-    resources.put(RESOURCE_COLUMN, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
-
-    // policy
-    List<RangerPolicy.RangerPolicyItemAccess> accesses = new ArrayList<RangerPolicy.RangerPolicyItemAccess>();
-    accesses.add(new RangerPolicy.RangerPolicyItemAccess(ACCESS_TYPE_SELECT));
     RangerPolicy.RangerPolicyItem item = new RangerPolicy.RangerPolicyItem(accesses, null, Arrays.asList(RangerPolicyEngine.GROUP_PUBLIC), null, null, false);
 
     defaultDBPolicy.setResources(resources);
