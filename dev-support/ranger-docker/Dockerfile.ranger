@@ -15,7 +15,7 @@
 # limitations under the License.
 ARG RANGER_DB_TYPE
 
-FROM ranger-base:latest AS ranger
+FROM harbor.nexr.kr/ndap/ranger-admin:base AS ranger
 
 ARG RANGER_VERSION
 ARG RANGER_DB_TYPE
