@@ -53,11 +53,13 @@ public class RangerServiceTrino extends RangerBaseService {
   public static final String ACCESS_TYPE_ALL    = "all";
   public static final String WILDCARD_ASTERISK  = "*";
 
+  public static final String ALL_CATALOG_INFORMATIONSCHEMA = "information_schema";
+  public static final String ALL_CATALOG_INFORMATION_SCHEMA_DB_POLICYNAME = "all - catalog information_schema schema tables columns";
+
   public static final String SPARK_CATALOG_DEFAULT_NAME = "spark";
   public static final String SPARK_DB_DEFAULT   		        = "default";
   public static final String SPARK_DEFAULT_DB_POLICYNAME = "spark catalog default schema tables columns";
-  public static final String SPARK_DB_INFORMATIONSCHEMA   		        = "information_schema";
-  public static final String SPARK_DB_INFORMATION_SCHEMA_DB_POLICYNAME = "spark catalog information_schema schema tables columns";
+
   public static final String SPARK_USERHOME_DB_POLICYNAME = "spark catalog {USER} schema tables columns";
 
   public static final String ICEBERG_CATALOG_DEFAULT_NAME = "iceberg";
@@ -132,8 +134,8 @@ public class RangerServiceTrino extends RangerBaseService {
     }
 
     //Policy for hive catalog information_schema db
-    RangerPolicy hiveInformationSchemaDBPolicy = createHiveInformationSchemaDBPolicy();
-    ret.add(hiveInformationSchemaDBPolicy);
+    RangerPolicy allCatalogInformationSchemaDBPolicy = createAllCatalogInformationSchemaDBPolicy();
+    ret.add(allCatalogInformationSchemaDBPolicy);
 
     //Policy for spark catalog default db
     RangerPolicy sparkDefaultDBPolicy = createSparkDefaultDBPolicy();
@@ -213,16 +215,16 @@ public class RangerServiceTrino extends RangerBaseService {
     return defaultDBPolicy;
   }
 
-  private RangerPolicy createHiveInformationSchemaDBPolicy() {
+  private RangerPolicy createAllCatalogInformationSchemaDBPolicy() {
     RangerPolicy defaultDBPolicy = new RangerPolicy();
 
-    defaultDBPolicy.setName(SPARK_DB_INFORMATION_SCHEMA_DB_POLICYNAME);
+    defaultDBPolicy.setName(ALL_CATALOG_INFORMATION_SCHEMA_DB_POLICYNAME);
     defaultDBPolicy.setService(serviceName);
 
     // resources
     Map<String, RangerPolicy.RangerPolicyResource> resources = new HashMap<>();
-    resources.put(RESOURCE_CATALOG, new RangerPolicy.RangerPolicyResource(Arrays.asList(SPARK_CATALOG_DEFAULT_NAME), false, false));
-    resources.put(RESOURCE_SCHEMA, new RangerPolicy.RangerPolicyResource(Arrays.asList(SPARK_DB_INFORMATIONSCHEMA), false, false));
+    resources.put(RESOURCE_CATALOG, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
+    resources.put(RESOURCE_SCHEMA, new RangerPolicy.RangerPolicyResource(Arrays.asList(ALL_CATALOG_INFORMATIONSCHEMA), false, false));
     resources.put(RESOURCE_TABLE, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
     resources.put(RESOURCE_COLUMN, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
 
