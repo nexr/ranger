@@ -58,7 +58,7 @@ public class RangerServiceHive extends RangerBaseService {
 	public static final String HIVE_DB_INFOMATION_SCHEMA        = "information_schema";
 	public static final String DEFAULT_DB_POLICYNAME 		    = "default database tables columns";
 	public static final String INFORMATION_SCHEMA_DB_POLICYNAME = "Information_schema database tables columns";
-
+    public static final String USER_DB_POLICYNAME 		        = "{USER} database tables columns";
 
 
 	public RangerServiceHive() {
@@ -165,6 +165,10 @@ public class RangerServiceHive extends RangerBaseService {
 		RangerPolicy defaultDBPolicy = createDefaultDBPolicy();
 		ret.add(defaultDBPolicy);
 
+		//Policy for {USER} db
+		RangerPolicy userDBPolicy = createUserDBPolicy();
+		ret.add(userDBPolicy);
+
 		// Policy for information_schema db
 		RangerPolicy informationSchemaPolicy = createInformationSchemaPolicy();
 		ret.add(informationSchemaPolicy);
@@ -248,5 +252,36 @@ public class RangerServiceHive extends RangerBaseService {
 
 		return Collections.singletonList(item);
 	}
+
+	private RangerPolicy createUserDBPolicy() {
+		RangerPolicy defaultDBPolicy = new RangerPolicy();
+
+		defaultDBPolicy.setName(USER_DB_POLICYNAME);
+		defaultDBPolicy.setService(serviceName);
+		defaultDBPolicy.setResources(createUserDBPolicyResource());
+		defaultDBPolicy.setPolicyItems(createUserDBPolicyItem());
+
+		return defaultDBPolicy;
+	}
+
+	private Map<String, RangerPolicyResource> createUserDBPolicyResource() {
+		Map<String, RangerPolicyResource> resources = new HashMap<>();
+
+		resources.put(RESOURCE_DATABASE, new RangerPolicyResource(Arrays.asList(RangerPolicyEngine.USER_CURRENT), false, false));
+		resources.put(RESOURCE_TABLE, new RangerPolicyResource(WILDCARD_ASTERISK));
+		resources.put(RESOURCE_COLUMN, new RangerPolicyResource(WILDCARD_ASTERISK));
+
+		return resources;
+	}
+
+	private List<RangerPolicyItem> createUserDBPolicyItem() {
+		List<RangerPolicyItemAccess> accesses = new ArrayList<RangerPolicyItemAccess>();
+
+		accesses.add(new RangerPolicyItemAccess(ACCESS_TYPE_ALL));
+
+		RangerPolicyItem item = new RangerPolicyItem(accesses, Arrays.asList(RangerPolicyEngine.USER_CURRENT), null, null, null, false);
+
+ 		return Collections.singletonList(item);
+ 	}
 }
 
