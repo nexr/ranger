@@ -223,7 +223,7 @@ public class RangerServiceTrino extends RangerBaseService {
 
     // resources
     Map<String, RangerPolicy.RangerPolicyResource> resources = new HashMap<>();
-    resources.put(RESOURCE_CATALOG, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
+    resources.put(RESOURCE_CATALOG, new RangerPolicy.RangerPolicyResource(Arrays.asList(WILDCARD_ASTERISK), false, false));
     resources.put(RESOURCE_SCHEMA, new RangerPolicy.RangerPolicyResource(Arrays.asList(ALL_CATALOG_INFORMATIONSCHEMA), false, false));
     resources.put(RESOURCE_TABLE, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
     resources.put(RESOURCE_COLUMN, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
