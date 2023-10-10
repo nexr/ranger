@@ -49,6 +49,6 @@ RUN     mv /home/ranger/dist/mysql-connector-java-8.0.28.jar /usr/share/java/mys
 
 FROM ranger_${RANGER_DB_TYPE}
 
-USER ranger
+USER root
 
 ENTRYPOINT [ "/home/ranger/scripts/ranger.sh" ]
