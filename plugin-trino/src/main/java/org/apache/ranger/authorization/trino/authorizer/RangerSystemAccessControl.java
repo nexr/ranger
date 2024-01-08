@@ -460,6 +460,16 @@ public class RangerSystemAccessControl
     }
   }
 
+
+  @Override
+  public void checkCanUpdateTableColumns(SystemSecurityContext context, CatalogSchemaTableName table, Set<String> updatedColumnNames) {
+    for (RangerTrinoResource res : createResource(table, updatedColumnNames)) {
+      if (!hasPermission(res, context, TrinoAccessType.UPDATE)) {
+        LOG.debug("RangerSystemAccessControl.checkCanUpdateTableColumns(" + table.getSchemaTableName().getTableName() + ") denied");
+      }
+    }
+  }
+
 @Override
   public void checkCanTruncateTable(SystemSecurityContext context, CatalogSchemaTableName table) {
     if (!hasPermission(createResource(table), context, TrinoAccessType.DELETE)) {
@@ -910,5 +920,5 @@ class RangerTrinoAccessRequest
 }
 
 enum TrinoAccessType {
-  CREATE, DROP, SELECT, INSERT, DELETE, USE, ALTER, ALL, GRANT, REVOKE, SHOW, IMPERSONATE, EXECUTE;
+  CREATE, DROP, SELECT, INSERT, DELETE, USE, ALTER, ALL, GRANT, REVOKE, SHOW, IMPERSONATE, EXECUTE, UPDATE;
 }
