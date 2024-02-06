@@ -287,7 +287,7 @@ public class MySQLPLRunner {
     public static void main(String args[]){
     	// Creating object of ScriptRunner class
     	  Connection con = null;
-    	  String driverName = "com.mysql.jdbc.Driver";
+    	  String driverName = "com.mysql.cj.jdbc.Driver";
     	  Properties props = null;
     	  try {
               Class.forName(driverName).newInstance();
