@@ -282,7 +282,7 @@ def add_advanced_ranger_configurations(add_admin_or_usersync, ranger_service_pro
 			advanced_ranger_admin_site_properties['ranger.service.https.attrib.keystore.pass'] = ranger_service_properties_from_file.get('ranger.service.https.attrib.keystore.pass','xasecure')
 			advanced_ranger_admin_site_properties['ranger.https.attrib.keystore.file'] = ranger_service_properties_from_file.get('ranger.https.attrib.keystore.file','/etc/ranger/admin/conf/ranger-admin-keystore.jks')
 			advanced_ranger_admin_site_properties['ranger.externalurl'] = ranger_service_properties_from_file.get('ranger.externalurl','http://localhost:6080')
-			advanced_ranger_admin_site_properties['ranger.jpa.jdbc.driver'] = ranger_service_properties_from_file.get('ranger.jpa.jdbc.driver','com.mysql.jdbc.Driver')
+			advanced_ranger_admin_site_properties['ranger.jpa.jdbc.driver'] = ranger_service_properties_from_file.get('ranger.jpa.jdbc.driver','com.mysql.cj.jdbc.Driver')
 			advanced_ranger_admin_site_properties['ranger.jpa.jdbc.url'] = ranger_service_properties_from_file.get('ranger.jpa.jdbc.url','jdbc:mysql://localhost')
 			advanced_ranger_admin_site_properties['ranger.jpa.jdbc.user'] = ranger_service_properties_from_file['ranger.jpa.jdbc.user']
 			advanced_ranger_admin_site_properties['ranger.jpa.jdbc.password'] = ranger_service_properties_from_file['ranger.jpa.jdbc.password']

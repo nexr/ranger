@@ -87,7 +87,7 @@ import org.apache.util.outputformatter.JisqlFormatter;
  * <li><b>pointbase </b>- short for
  * <code>com.pointbase.jdbc.jdbcUniversalDriver</code></li>
  * <li><b>postgresql </b>- short for <code>org.postgresql.Driver</code></li>
- * <li><b>mysqlconj </b>- short for <code>com.mysql.jdbc.Driver</code>- the
+ * <li><b>mysqlconj </b>- short for <code>com.mysql.cj.jdbc.Driver</code>- the
  * Connector/J driver for MySQL</li>
  * <li><b>mysqlcaucho </b>- short for <code>com.caucho.jdbc.mysql.Driver</code>-
  * the Caucho driver for MySQL</li>
@@ -224,7 +224,7 @@ public class Jisql {
     private static final String msqlDriverName = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private static final String pointbaseDriverName = "com.pointbase.jdbc.jdbcUniversalDriver";
     private static final String postgresqlDriverName = "org.postgresql.Driver";
-    private static final String mySQLConnectJDriverName = "com.mysql.jdbc.Driver";
+    private static final String mySQLConnectJDriverName = "com.mysql.cj.jdbc.Driver";
     private static final String mySQLCauchoDriverName = "com.caucho.jdbc.mysql.Driver";
 
     private static final String defaultFormatterClassName = "org.apache.util.outputformatter.DefaultFormatter";

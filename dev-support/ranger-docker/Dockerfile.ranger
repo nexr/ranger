@@ -14,8 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ARG RANGER_DB_TYPE
-
-FROM harbor.nexr.kr/ndap/ranger-admin:base AS ranger
+ARG HARBOR_URL=${HARBOR_URL}
+ARG HARBOR_DEV_REPOSITORY=${HARBOR_DEV_REPOSITORY}
+ARG RANGER_ADMIN_VERSION=${RANGER_ADMIN_VERSION}
+FROM ${HARBOR_URL}/${HARBOR_DEV_REPOSITORY}/ranger-admin:${RANGER_ADMIN_VERSION}-base AS ranger
 
 ARG RANGER_VERSION
 ARG RANGER_DB_TYPE
