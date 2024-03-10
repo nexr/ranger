@@ -17,8 +17,10 @@ ARG RANGER_DB_TYPE
 ARG HARBOR_URL=${HARBOR_URL}
 ARG HARBOR_DEV_REPOSITORY=${HARBOR_DEV_REPOSITORY}
 ARG RANGER_ADMIN_VERSION=${RANGER_ADMIN_VERSION}
+ARG HARBOR_URL=${HARBOR_URL}
+ARG HARBOR_DEV_REPOSITORY=${HARBOR_DEV_REPOSITORY}
+ARG RANGER_ADMIN_VERSION=${RANGER_ADMIN_VERSION}
 FROM ${HARBOR_URL}/${HARBOR_DEV_REPOSITORY}/ranger-admin:${RANGER_ADMIN_VERSION}-base AS ranger
-
 ARG RANGER_VERSION
 ARG RANGER_DB_TYPE
 
@@ -35,7 +37,8 @@ RUN    tar xvfz /home/ranger/dist/ranger-${RANGER_VERSION}-admin.tar.gz --direct
     && mkdir -p /var/run/ranger \
     && mkdir -p /var/log/ranger \
     && chown -R ranger:ranger ${RANGER_HOME}/admin/ ${RANGER_SCRIPTS}/ /var/run/ranger/ /var/log/ranger/ \
-    && mkdir -p /usr/share/java/
+    && mkdir -p /usr/share/java/ \
+    && apt-get install tini
 
 FROM ranger AS ranger_postgres
 COPY ./downloads/postgresql-42.2.16.jre7.jar      /home/ranger/dist/
@@ -51,4 +54,4 @@ FROM ranger_${RANGER_DB_TYPE}
 
 USER root
 
-ENTRYPOINT [ "/home/ranger/scripts/ranger.sh" ]
+ENTRYPOINT [ "tini", "--", "/home/ranger/scripts/ranger.sh" ]
