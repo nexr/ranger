@@ -385,4 +385,9 @@
 			<name>ranger.admin.cookie.name</name>
 			<value>RANGERADMINSESSIONID</value>
 		</property>
+	    <property>
+		    <name>ranger.contextName</name>
+		    <value>/ranger</value>
+		    <description></description>
+	    </property>
 </configuration>
