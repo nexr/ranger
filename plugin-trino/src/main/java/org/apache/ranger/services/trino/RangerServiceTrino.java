@@ -80,8 +80,6 @@ public class RangerServiceTrino extends RangerBaseService {
     List<RangerPolicy> ret = super.getDefaultRangerPolicies();
     for (RangerPolicy defaultPolicy : ret) {
       final Map<String, RangerPolicy.RangerPolicyResource> policyResources = defaultPolicy.getResources();
-      LOG.info("defaultPolicy:"+defaultPolicy);
-      LOG.info("policyResources:"+policyResources.toString());
       if (defaultPolicy.getName().contains("all") && StringUtils.isNotBlank(lookUpUser)) {
         RangerPolicy.RangerPolicyItem policyItemForLookupUser = new RangerPolicy.RangerPolicyItem();
         policyItemForLookupUser.setUsers(Collections.singletonList(lookUpUser));
@@ -144,7 +142,6 @@ public class RangerServiceTrino extends RangerBaseService {
     if (LOG.isDebugEnabled()) {
       LOG.debug("<== RangerServiceTrino.getDefaultRangerPolicies()");
     }
-    LOG.info("ret:"+ret);
     return ret;
   }
 
