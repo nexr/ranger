@@ -80,6 +80,8 @@ public class RangerServiceTrino extends RangerBaseService {
     List<RangerPolicy> ret = super.getDefaultRangerPolicies();
     for (RangerPolicy defaultPolicy : ret) {
       final Map<String, RangerPolicy.RangerPolicyResource> policyResources = defaultPolicy.getResources();
+      LOG.info("defaultPolicy:",defaultPolicy);
+      LOG.info("policyResources:",policyResources);
       if (defaultPolicy.getName().contains("all") && StringUtils.isNotBlank(lookUpUser)) {
         RangerPolicy.RangerPolicyItem policyItemForLookupUser = new RangerPolicy.RangerPolicyItem();
         policyItemForLookupUser.setUsers(Collections.singletonList(lookUpUser));
@@ -89,15 +91,14 @@ public class RangerServiceTrino extends RangerBaseService {
       }
 
       if (policyResources.size() == 2 && hasWildcardAsteriskResource(policyResources, RESOURCE_CATALOG, RESOURCE_SCHEMA)) { // policy for all catalog, schema
-        RangerPolicy.RangerPolicyItem policyItemPublic = new RangerPolicy.RangerPolicyItem();
+        RangerPolicy.RangerPolicyItem policyItem = new RangerPolicy.RangerPolicyItem();
 
-        policyItemPublic.setGroups(Collections.singletonList(RangerPolicyEngine.GROUP_PUBLIC));
         List<RangerPolicy.RangerPolicyItemAccess> accesses = new ArrayList<RangerPolicy.RangerPolicyItemAccess>();
         accesses.add(new RangerPolicy.RangerPolicyItemAccess(ACCESS_TYPE_SELECT));
         accesses.add(new RangerPolicy.RangerPolicyItemAccess(ACCESS_TYPE_CREATE));
         accesses.add(new RangerPolicy.RangerPolicyItemAccess(ACCESS_TYPE_SHOW));
-        policyItemPublic.setAccesses(accesses);
-        defaultPolicy.getPolicyItems().add(policyItemPublic);
+        policyItem.setAccesses(accesses);
+        defaultPolicy.getPolicyItems().add(policyItem);
       } else if (policyResources.size() == 1 && hasWildcardAsteriskResource(policyResources, RESOURCE_CATALOG)) { // policy for all catalog
         RangerPolicy.RangerPolicyItem policyItemPublic = new RangerPolicy.RangerPolicyItem();
 
@@ -152,6 +153,7 @@ public class RangerServiceTrino extends RangerBaseService {
     if (LOG.isDebugEnabled()) {
       LOG.debug("<== RangerServiceTrino.getDefaultRangerPolicies()");
     }
+    LOG.info("ret:",ret);
     return ret;
   }
 
