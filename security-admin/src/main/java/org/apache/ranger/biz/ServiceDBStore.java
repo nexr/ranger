@@ -3406,6 +3406,7 @@ public class ServiceDBStore extends AbstractServiceStore {
 						}
 						ret.add(defaultPolicy);
 					} else {
+						LOG.warn("isPolicyItemValid:false==>"+defaultPolicy.getPolicyItems());
 						LOG.warn("Default policy won't be created,since policyItems not valid-either users/groups not present or access not present in policy.");
 					}
 				}
