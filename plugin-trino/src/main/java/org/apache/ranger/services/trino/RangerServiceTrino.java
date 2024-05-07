@@ -56,6 +56,8 @@ public class RangerServiceTrino extends RangerBaseService {
   public static final String ALL_CATALOG_INFORMATIONSCHEMA = "information_schema";
   public static final String ALL_CATALOG_INFORMATION_SCHEMA_DB_POLICYNAME = "all - catalog information_schema schema tables columns";
 
+  public static final String ALL_CATALOG_USER_SCHEMA_DB_POLICYNAME = "all - catalog {USER} schema tables columns";
+
   public static final String SPARK_CATALOG_DEFAULT_NAME = "spark";
   public static final String SPARK_DB_DEFAULT   		        = "default";
   public static final String SPARK_DEFAULT_DB_POLICYNAME = "spark catalog default schema tables columns";
@@ -139,6 +141,11 @@ public class RangerServiceTrino extends RangerBaseService {
     RangerPolicy systemCatalogPolicy = createSystemCatalogPolicy();
     ret.add(systemCatalogPolicy);
 
+    //Policy for all catalog user schema db
+    RangerPolicy allCatalogUserSchemaDBPolicy = createAllCatalogUserSchemaDBPolicy();
+    ret.add(allCatalogUserSchemaDBPolicy);
+
+
     if (LOG.isDebugEnabled()) {
       LOG.debug("<== RangerServiceTrino.getDefaultRangerPolicies()");
     }
@@ -198,6 +205,30 @@ public class RangerServiceTrino extends RangerBaseService {
     List<RangerPolicy.RangerPolicyItemAccess> accesses = new ArrayList<RangerPolicy.RangerPolicyItemAccess>();
     accesses.add(new RangerPolicy.RangerPolicyItemAccess(ACCESS_TYPE_CREATE));
     RangerPolicy.RangerPolicyItem item = new RangerPolicy.RangerPolicyItem(accesses, null, Arrays.asList(RangerPolicyEngine.GROUP_PUBLIC), null, null, false);
+
+    defaultDBPolicy.setResources(resources);
+    defaultDBPolicy.setPolicyItems(Collections.singletonList(item));
+
+    return defaultDBPolicy;
+  }
+
+  private RangerPolicy createAllCatalogUserSchemaDBPolicy() {
+    RangerPolicy defaultDBPolicy = new RangerPolicy();
+
+    defaultDBPolicy.setName(ALL_CATALOG_USER_SCHEMA_DB_POLICYNAME);
+    defaultDBPolicy.setService(serviceName);
+
+    // resources
+    Map<String, RangerPolicy.RangerPolicyResource> resources = new HashMap<>();
+    resources.put(RESOURCE_CATALOG, new RangerPolicy.RangerPolicyResource(Arrays.asList(WILDCARD_ASTERISK), false, false));
+    resources.put(RESOURCE_SCHEMA, new RangerPolicy.RangerPolicyResource(Arrays.asList(RangerPolicyEngine.USER_CURRENT), false, false));
+    resources.put(RESOURCE_TABLE, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
+    resources.put(RESOURCE_COLUMN, new RangerPolicy.RangerPolicyResource(WILDCARD_ASTERISK));
+
+    // policy
+    List<RangerPolicy.RangerPolicyItemAccess> accesses = new ArrayList<RangerPolicy.RangerPolicyItemAccess>();
+    accesses.add(new RangerPolicy.RangerPolicyItemAccess(ACCESS_TYPE_ALL));
+    RangerPolicy.RangerPolicyItem item = new RangerPolicy.RangerPolicyItem(accesses, Arrays.asList(RangerPolicyEngine.USER_CURRENT), null, null, null, false);
 
     defaultDBPolicy.setResources(resources);
     defaultDBPolicy.setPolicyItems(Collections.singletonList(item));
